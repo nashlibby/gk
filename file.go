@@ -92,13 +92,13 @@ func InsertOneLineToFile(filePath string, content string, targetString string, p
 
 		if insertPosition == "after" {
 			chunks = append(chunks, line...)
-			if strings.TrimSpace(strings.Trim(line, "\n")) == targetString {
+			if strings.Contains(strings.TrimSpace(strings.Trim(line, "\n")), targetString) {
 				chunks = append(chunks, content+"\n"...)
 			}
 		}
 
 		if insertPosition == "before" {
-			if strings.TrimSpace(strings.Trim(line, "\n")) == targetString {
+			if strings.Contains(strings.TrimSpace(strings.Trim(line, "\n")), targetString) {
 				chunks = append(chunks, content+"\n"...)
 			}
 			chunks = append(chunks, line...)
