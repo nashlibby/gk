@@ -1,4 +1,4 @@
-module gk
+module github.com/nashlibby/gk
 
 go 1.18
 
