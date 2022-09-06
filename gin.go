@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
+	"strings"
 	"time"
 )
 
@@ -52,9 +53,16 @@ func (w bodyLogWriter) WriteString(s string) (int, error) {
 }
 
 // gin 日志中间件
-func GinLogger() gin.HandlerFunc {
-	logger := Logger("api")
+func GinLogger(skipPath ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if len(skipPath) > 0 {
+			for _, v := range skipPath {
+				if strings.Contains(c.FullPath(), v) {
+					return
+				}
+			}
+		}
+		logger := Logger("api")
 		blw := &bodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
 		c.Writer = blw
 		// 开始时间
