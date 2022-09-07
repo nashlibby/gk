@@ -5,27 +5,23 @@ import (
 )
 
 type AliyunSms struct {
+	Config AliyunSmsConfig
+}
+
+type AliyunSmsConfig struct {
 	AccessKey    string `json:"access_key"`
 	AccessSecret string `json:"access_secret"`
 }
 
-type Response struct {
-	RequestId  string `json:"request_id"`
-	ResponseId string `json:"response_id"`
-	Message    string `json:"message"`
-	Code       string `json:"code"`
-}
-
-func NewAliyunSms(accessKey, accessSecret string) *AliyunSms {
+func NewAliyunSms(config AliyunSmsConfig) Sms {
 	return &AliyunSms{
-		AccessKey:    accessKey,
-		AccessSecret: accessSecret,
+		Config: config,
 	}
 }
 
 // 发送短信
-func (a *AliyunSms) Send(phone, sign, template, data string) (Response, error) {
-	client, err := dysmsapi.NewClientWithAccessKey("ap-northeast-1", a.AccessKey, a.AccessSecret)
+func (a *AliyunSms) Send(phone, sign, template, data string) (SmsResponse, error) {
+	client, err := dysmsapi.NewClientWithAccessKey("ap-northeast-1", a.Config.AccessKey, a.Config.AccessSecret)
 	request := dysmsapi.CreateSendSmsRequest()
 	request.Scheme = "https"
 
@@ -35,7 +31,7 @@ func (a *AliyunSms) Send(phone, sign, template, data string) (Response, error) {
 	request.TemplateParam = data
 
 	res, err := client.SendSms(request)
-	return Response{
+	return SmsResponse{
 		RequestId:  res.RequestId,
 		ResponseId: res.BizId,
 		Message:    res.Message,
