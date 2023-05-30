@@ -3,7 +3,7 @@ package gk
 import (
 	"bytes"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 )
@@ -20,6 +20,7 @@ type AliyunOssConfig struct {
 	IsCname      bool   `json:"is_cname"`
 	Debug        bool   `json:"debug"`
 	Prefix       string `json:"prefix"`
+	CdnName      string `json:"cdn_name"`
 }
 
 func NewAliyunOss(config AliyunOssConfig) Oss {
@@ -49,7 +50,11 @@ func (a *AliyunOss) UploadFile(remotePath string, file []byte) (remoteUrl string
 		return remoteUrl, err
 	}
 
-	return "https://" + a.Config.BucketName + "." + a.Config.Endpoint + "/" + strings.TrimLeft(remotePath, "/"), nil
+	if a.Config.CdnName != "" {
+		return "https://" + a.Config.CdnName + "/" + strings.TrimLeft(remotePath, "/"), nil
+	} else {
+		return "https://" + a.Config.BucketName + "." + a.Config.Endpoint + "/" + strings.TrimLeft(remotePath, "/"), nil
+	}
 }
 
 // 绝对地址直接转换为阿里云地址
@@ -78,7 +83,11 @@ func (a *AliyunOss) TransformFile(remotePath, url string) (remoteUrl string, err
 		return remoteUrl, err
 	}
 
-	return "https://" + a.Config.BucketName + "." + a.Config.Endpoint + "/" + strings.TrimLeft(remotePath, "/"), nil
+	if a.Config.CdnName != "" {
+		return "https://" + a.Config.CdnName + "/" + strings.TrimLeft(remotePath, "/"), nil
+	} else {
+		return "https://" + a.Config.BucketName + "." + a.Config.Endpoint + "/" + strings.TrimLeft(remotePath, "/"), nil
+	}
 }
 
 // 远程文件读
@@ -89,5 +98,5 @@ func (a *AliyunOss) ReadRemoteFile(url string) (file []byte, err error) {
 	}
 	defer resp.Body.Close()
 
-	return ioutil.ReadAll(resp.Body)
+	return io.ReadAll(resp.Body)
 }
