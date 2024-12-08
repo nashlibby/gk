@@ -90,6 +90,37 @@ func (a *AliyunOss) TransformFile(remotePath, url string) (remoteUrl string, err
 	}
 }
 
+// 获取object文件
+func (a *AliyunOss) GetObjectFile(objectKey string) (file []byte, err error) {
+	// 创建OSSClient实例。
+	client, err := oss.New(a.Config.Endpoint, a.Config.AccessKey, a.Config.AccessSecret)
+	if err != nil {
+		return
+	}
+
+	// 获取存储空间
+	bucket, err := client.Bucket(a.Config.BucketName)
+	if err != nil {
+		return
+	}
+
+	// 获取object
+	object, err := bucket.GetObject(objectKey)
+	if err != nil {
+		return
+	}
+	defer object.Close()
+
+	// 读取文件内容
+	fileBytes, err := io.ReadAll(object)
+	if err != nil {
+		return
+	}
+
+	// 返回文件内容
+	return fileBytes, nil
+}
+
 // 远程文件读
 func (a *AliyunOss) ReadRemoteFile(url string) (file []byte, err error) {
 	resp, err := http.Get(url)

@@ -2,11 +2,11 @@ package gk
 
 import (
 	"bytes"
+	"crypto/rand"
 	"log"
-	"math/rand"
+	"math/big"
 	"strconv"
 	"strings"
-	"time"
 	"unicode"
 )
 
@@ -88,13 +88,16 @@ func FirstLower(s string) string {
 	return strings.ToLower(s[:1]) + s[1:]
 }
 
-// 获取随机字符串
-func GetRandomString(l int) string {
-	rand.Seed(time.Now().UnixNano())
-	var letters = []rune("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-	b := make([]rune, l)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
+// GenerateRandomString 生成一个指定长度的随机字符串
+func GenerateRandomString(length int) (string, error) {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	var result strings.Builder
+	for i := 0; i < length; i++ {
+		randomIndex, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+		if err != nil {
+			return "", err
+		}
+		result.WriteByte(charset[randomIndex.Int64()])
 	}
-	return string(b)
+	return result.String(), nil
 }
