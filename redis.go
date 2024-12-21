@@ -42,17 +42,8 @@ func (r *GRedis) Set(key string, val interface{}, expiration time.Duration) (err
 	return
 }
 
-func (r *GRedis) Get(key string) (val interface{}, err error) {
-	data, err := r.Client.Get(r.Ctx, key).Result()
-	if err != nil {
-		return
-	}
-
-	err = json.Unmarshal([]byte(data), &val)
-	if err != nil {
-		return
-	}
-	return
+func (r *GRedis) Get(key string) (val string, err error) {
+	return r.Client.Get(r.Ctx, key).Result()
 }
 
 func (r *GRedis) Has(key string) (int64, error) {
