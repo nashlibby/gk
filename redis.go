@@ -2,6 +2,7 @@ package gk
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/redis/go-redis/v9"
 	"strconv"
 	"time"
@@ -33,12 +34,24 @@ func NewRedisClient(config RedisConfig) *GRedis {
 }
 
 func (r *GRedis) Set(key string, val interface{}, expiration time.Duration) (err error) {
-	err = r.Client.Set(r.Ctx, key, val, expiration).Err()
+	jData, err := json.Marshal(val)
+	if err != nil {
+		return err
+	}
+	err = r.Client.Set(r.Ctx, key, string(jData), expiration).Err()
 	return
 }
 
 func (r *GRedis) Get(key string) (val interface{}, err error) {
-	val, err = r.Client.Get(r.Ctx, key).Result()
+	data, err := r.Client.Get(r.Ctx, key).Result()
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal([]byte(data), &val)
+	if err != nil {
+		return
+	}
 	return
 }
 
