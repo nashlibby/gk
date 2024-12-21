@@ -2,7 +2,7 @@ package gk
 
 import (
 	"context"
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 	"strconv"
 	"time"
 )
@@ -37,7 +37,7 @@ func (r *GRedis) Set(key string, val interface{}, expiration time.Duration) (err
 	return
 }
 
-func (r *GRedis) Get(key string) (val string, err error) {
+func (r *GRedis) Get(key string) (val interface{}, err error) {
 	val, err = r.Client.Get(r.Ctx, key).Result()
 	return
 }
@@ -49,5 +49,20 @@ func (r *GRedis) Has(key string) error {
 
 func (r *GRedis) Del(key string) error {
 	_, err := r.Client.Del(r.Ctx, key).Result()
+	return err
+}
+
+func (r *GRedis) Hset(key string, values ...interface{}) error {
+	_, err := r.Client.HSet(r.Ctx, key, values).Result()
+	return err
+}
+
+func (r *GRedis) Hget(key, field string) error {
+	_, err := r.Client.HGet(r.Ctx, key, field).Result()
+	return err
+}
+
+func (r *GRedis) HgetAll(key, field string) error {
+	_, err := r.Client.HGetAll(r.Ctx, key).Result()
 	return err
 }
