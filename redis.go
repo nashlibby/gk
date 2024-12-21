@@ -42,27 +42,27 @@ func (r *GRedis) Get(key string) (val interface{}, err error) {
 	return
 }
 
-func (r *GRedis) Has(key string) error {
-	_, err := r.Client.Exists(r.Ctx, key).Result()
-	return err
+func (r *GRedis) Has(key string) (int64, error) {
+	count, err := r.Client.Exists(r.Ctx, key).Result()
+	return count, err
 }
 
-func (r *GRedis) Del(key string) error {
-	_, err := r.Client.Del(r.Ctx, key).Result()
-	return err
+func (r *GRedis) Del(key string) (int64, error) {
+	count, err := r.Client.Del(r.Ctx, key).Result()
+	return count, err
 }
 
 func (r *GRedis) Hset(key string, values ...interface{}) error {
-	_, err := r.Client.HSet(r.Ctx, key, values).Result()
+	err := r.Client.HSet(r.Ctx, key, values).Err()
 	return err
 }
 
-func (r *GRedis) Hget(key, field string) error {
-	_, err := r.Client.HGet(r.Ctx, key, field).Result()
-	return err
+func (r *GRedis) Hget(key, field string) (string, error) {
+	result, err := r.Client.HGet(r.Ctx, key, field).Result()
+	return result, err
 }
 
-func (r *GRedis) HgetAll(key, field string) error {
-	_, err := r.Client.HGetAll(r.Ctx, key).Result()
-	return err
+func (r *GRedis) HgetAll(key, field string) (map[string]string, error) {
+	result, err := r.Client.HGetAll(r.Ctx, key).Result()
+	return result, err
 }
