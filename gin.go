@@ -2,8 +2,9 @@ package gk
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"io/ioutil"
+	"io"
 	"strings"
 	"time"
 )
@@ -68,8 +69,8 @@ func GinLogger(skipPath ...string) gin.HandlerFunc {
 		// 开始时间
 		startTime := time.Now()
 		// 请求body
-		requestBody, _ := ioutil.ReadAll(c.Request.Body)
-		c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+		requestBody, _ := io.ReadAll(c.Request.Body)
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(requestBody))
 		// 处理请求
 		c.Next()
 		// 结束时间
@@ -97,4 +98,13 @@ func GinLogger(skipPath ...string) gin.HandlerFunc {
 			responseBody,
 		)
 	}
+}
+
+func GinLog(str string) {
+	fmt.Println("[GIN] " + time.Now().Format("2006/01/02 - 15:04:05") + " " + str)
+}
+
+func GinLogf(format string, a ...any) {
+	prefixStr := "[GIN] " + time.Now().Format("2006/01/02 - 15:04:05") + " "
+	fmt.Println(fmt.Sprintf(prefixStr+format, a...))
 }
